@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">NyTimesArticles</string>
+    <string name="error_internet">No Internet Connection&#8230;</string>
+    <string name="something_wrong_alert">Something wrong</string>
+    <string name="loading">Loading</string>
+    <string name="appbar_scrolling_view_behavior">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="maintitle">NY Times Most Popular</string>
+    <string name="search">Search...</string>
+    <string name="enteremail">Enter Email Address</string>
+    <string name="login">Login</string>
+    <string name="entervalidemail">Enter Valid Email</string>
+    <string name="cryptochart">NVLP Chart</string>
+</resources>
