@@ -4,15 +4,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.View;
 import android.widget.Toast;
 
 import com.nvlp.R;
 import com.nvlp.databinding.ActivityLoginBinding;
 import com.nvlp.interfaces.ILogin;
 import com.nvlp.presenter.LoginPresenter;
+import com.nvlp.utils.EmailValidator;
 import com.nvlp.utils.Util;
 
 import androidx.annotation.Nullable;
@@ -23,6 +21,7 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
     private ActivityLoginBinding binding;
     private ProgressDialog progressDialog;
     private LoginPresenter loginPresenter;
+    private EmailValidator emailValidator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,34 +34,14 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
         loginPresenter = new LoginPresenter();
         loginPresenter.setView(this);
 
-        binding.edtEmail.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (Util.validateEmail(charSequence.toString())) {
-                    binding.inputEmail.setError(getString(R.string.entervalidemail));
-                } else {
-                    binding.inputEmail.setError("");
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-        binding.btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Util.validateEmail(binding.edtEmail.getText().toString())) {
-                    binding.inputEmail.setError(getString(R.string.entervalidemail));
-                } else {
-                    loginPresenter.login();
-                }
+        // Setup field validators.
+        emailValidator = new EmailValidator(this, binding.inputEmail);
+        binding.edtEmail.addTextChangedListener(emailValidator);
+        binding.btnLogin.setOnClickListener(view -> {
+            if (Util.validateEmail(binding.edtEmail.getText().toString())) {
+                binding.inputEmail.setError(getString(R.string.entervalidemail));
+            } else {
+                loginPresenter.login();
             }
         });
 
