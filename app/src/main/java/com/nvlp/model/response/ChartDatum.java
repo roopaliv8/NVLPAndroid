@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class ChartDatum {
 
+    //Chart response
+
     @SerializedName("name")
     @Expose
     private String name;

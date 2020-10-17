@@ -23,11 +23,12 @@ public class LoginPresenter extends BasePresenter<ILogin> {
 
         if (BasicUtils.isOnline(getView().getContext())) {
 
+            //Show loader
             getView().enableLoadingBar(true);
 
-            Call<LoginResponse> getArticles = service.login();
+            Call<LoginResponse> login = service.login();
 
-            APIHelper.enqueueWith(getArticles, new Callback<LoginResponse>() {
+            APIHelper.enqueueWith(login, new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                     getView().enableLoadingBar(false);
@@ -45,7 +46,9 @@ public class LoginPresenter extends BasePresenter<ILogin> {
 
                 @Override
                 public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+                    //hide loader
                     getView().enableLoadingBar(false);
+                    // Error message
                     handleError(t.getMessage());
                 }
 

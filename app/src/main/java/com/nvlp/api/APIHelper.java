@@ -15,6 +15,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.nvlp.utils.Constants.REFRESHTOKENCODE;
+
 
 public class APIHelper {
 
@@ -23,7 +25,15 @@ public class APIHelper {
     public static <T> void enqueueWith(Call<T> call, final Callback<T> callback) {
 
         call.enqueue(new Callback<T>() {
-
+            /**
+             * Invoked for a received HTTP response.
+             * <p>
+             * Note: An HTTP response may still indicate an application-level failure such as a 404 or 500.
+             * Call {@link Response#isSuccessful()} to determine if the response indicates success.
+             *
+             * @param call
+             * @param response
+             */
             @Override
             public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
 
@@ -39,26 +49,27 @@ public class APIHelper {
 
                         try {
                             gson = new Gson();
-                            ErrorParser mErrorParser;
-                            if (response.errorBody() != null) {
-                                mErrorParser = gson.fromJson(response.errorBody().string(), ErrorParser.class);
+                            ErrorParser mErrorParser = gson.fromJson(response.errorBody().string(), ErrorParser.class);
 
+                            if (mErrorParser.getCode() == REFRESHTOKENCODE) {
+                                callback.onResponse(call, response);
+                            } else {
                                 callback.onFailure(call, new ApiException(mErrorParser.getMessage()));
                             }
-
                         } catch (IOException e) {
                             e.printStackTrace();
                             callback.onFailure(call, new ApiException(BaseApp.getAppContext().getResources().getString(R.string.something_wrong_alert)));
                         }
 
                         break;
-
                     case HttpURLConnection.HTTP_BAD_REQUEST:
+
                         try {
                             gson = new Gson();
                             ErrorParser mErrorParser;
                             if (response.errorBody() != null) {
                                 mErrorParser = gson.fromJson(response.errorBody().string(), ErrorParser.class);
+
                                 callback.onFailure(call, new ApiException(mErrorParser.getMessage()));
                             }
 
@@ -66,27 +77,25 @@ public class APIHelper {
                             e.printStackTrace();
                             callback.onFailure(call, new ApiException(BaseApp.getAppContext().getResources().getString(R.string.something_wrong_alert)));
                         }
+
                         break;
+
 
                     case HttpURLConnection.HTTP_BAD_METHOD:
+                        callback.onFailure(call, new ApiException(BaseApp.getAppContext().getResources().getString(R.string.something_wrong_alert)));
                         break;
 
-                    default:
-                        try {
-                            gson = new Gson();
-                            ErrorParser mErrorParser;
-                            if (response.errorBody() != null) {
-                                mErrorParser = gson.fromJson(response.errorBody().string(), ErrorParser.class);
-                                callback.onFailure(call, new ApiException(mErrorParser.getMessage()));
-                            }
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            callback.onFailure(call, new ApiException(BaseApp.getAppContext().getResources().getString(R.string.something_wrong_alert)));
-                        }
-                        break;
                 }
             }
+
+            /**
+             * Invoked when a network exception occurred talking to the server or when an unexpected
+             * exception occurred creating the request or processing the response.
+             *
+             * @param call
+             * @param t
+             */
 
             @Override
             public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {

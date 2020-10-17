@@ -30,6 +30,8 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
         binding = DataBindingUtil.setContentView(
                 this, R.layout.activity_login);
 
+
+//presenter to call login api
         loginPresenter = new LoginPresenter();
         loginPresenter.setView(this);
 
@@ -93,6 +95,7 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
         enableLoader(enable);
     }
 
+    // show or hide loader
     private void enableLoader(boolean enable) {
         if (enable) {
             loadProgressBar();

@@ -7,7 +7,7 @@ import retrofit2.http.GET;
 
 public interface CryptoApis {
 
-    //Api for Most Popular Articles
+    //Login api to get token
     @GET("http://54.179.251.89:8080/login")
     Call<LoginResponse> login();
 

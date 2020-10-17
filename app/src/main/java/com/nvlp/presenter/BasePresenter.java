@@ -14,8 +14,8 @@ public abstract class BasePresenter<I extends IView> {
     public BasePresenter() {
     }
 
-    public BasePresenter(BaseApp jetSetaCustomerApp) {
-        this.apidemo = jetSetaCustomerApp;
+    public BasePresenter(BaseApp nvlpApp) {
+        this.apidemo = nvlpApp;
     }
 
     public I getView() {
