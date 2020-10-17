@@ -35,7 +35,6 @@ import static com.nvlp.utils.Constants.DEMOURL;
 
 public class ChartActivity extends BaseActivity {
     ActivityChartBinding binding;
-    String demodata = "[{\"name\":\"BTC\",\"key\":\"btc\",\"value\":70},{\"name\":\"ETH\",\"key\":\"eth\",\"value\":80},{\"name\":\"LTE\",\"key\":\"lte\",\"value\":79},{\"name\":\"RPL\",\"key\":\"rpl\",\"value\":23},{\"name\":\"PLN\",\"key\":\"pln\",\"value\":38},{\"name\":\"USD\",\"key\":\"usd\",\"value\":85},{\"name\":\"EUR\",\"key\":\"eur\",\"value\":67},{\"name\":\"THB\",\"key\":\"thb\",\"value\":23}]";
 
     List<ChartDatum> datumList;
     private ServerSentEvent sse;
@@ -66,11 +65,11 @@ public class ChartActivity extends BaseActivity {
 
     }
 
-    private void parseJSON() {
+    private void parseJSON(String json) {
         Gson gson = new Gson();
         Type type = new TypeToken<List<ChartDatum>>() {
         }.getType();
-        datumList = gson.fromJson(demodata, type);
+        datumList = gson.fromJson(json, type);
         addchatData(datumList);
 
     }
@@ -117,7 +116,7 @@ public class ChartActivity extends BaseActivity {
                 Log.d(TAG, "onMessage: ");
                 // When a message is received
                 if (datumList == null) {
-                    parseJSON();
+                    parseJSON(message);
                     runOnUiThread(() -> {
                         binding.chart.setDescription("");
                         binding.chart.animateXY(2000, 2000);
