@@ -6,7 +6,8 @@ import com.nvlp.model.response.LoginResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
-import static com.nvlp.utils.Constants.COMMONPORT;
+import static com.nvlp.BuildConfig.COMMONPORT;
+
 
 public interface CryptoApis {
 

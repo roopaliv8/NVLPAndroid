@@ -11,6 +11,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField 'String', 'BASEURL', '"' + BASEURL + '"'
+        buildConfigField 'String', 'COMMONPORT', '"' + COMMONPORT + '"'
+        buildConfigField 'String', 'SSEPORT', '"' + SSEPORT + '"'
     }
     buildTypes {
         release {
