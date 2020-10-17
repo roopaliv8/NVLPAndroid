@@ -11,22 +11,26 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="@dimen/activity_horizontal_margin"
+            app:layout_constraintTop_toTopOf="@id/toolbar"
             tools:context=".MainActivity">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@+id/toolbar" />
+                android:layout_height="match_parent" />
 
         </RelativeLayout>
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_collapseMode="pin"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <data />

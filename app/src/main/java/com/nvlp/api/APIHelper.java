@@ -101,7 +101,7 @@ public class APIHelper {
             public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
                 String error = null;
                 if (t instanceof IOException) {
-                    error = BaseApp.getAppContext().getResources().getString(R.string.error_internet);
+                    error = t.getMessage();
                 }
                 callback.onFailure(call, TextUtils.isEmpty(error) ? t : new ApiException(error));
             }
