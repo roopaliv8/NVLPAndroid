@@ -13,6 +13,7 @@ android {
         buildConfigField 'String', 'BASEURL', '"' + BASEURL + '"'
         buildConfigField 'String', 'COMMONPORT', '"' + COMMONPORT + '"'
         buildConfigField 'String', 'SSEPORT', '"' + SSEPORT + '"'
+        buildConfigField 'String', 'SSEURL', '"' + SSEURL + '"'
     }
     buildTypes {
         release {
