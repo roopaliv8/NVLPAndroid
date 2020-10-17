@@ -12,6 +12,6 @@ public class Util {
     // Email varification
     public static boolean validateEmail(String email) {
         Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
+        return !matcher.matches();
     }
 }

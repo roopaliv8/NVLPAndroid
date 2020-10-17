@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!Util.validateEmail(charSequence.toString())) {
+                if (Util.validateEmail(charSequence.toString())) {
                     binding.inputEmail.setError(getString(R.string.entervalidemail));
                 } else {
                     binding.inputEmail.setError("");
@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
         binding.btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!Util.validateEmail(binding.edtEmail.getText().toString())) {
+                if (Util.validateEmail(binding.edtEmail.getText().toString())) {
                     binding.inputEmail.setError(getString(R.string.entervalidemail));
                 } else {
                     loginPresenter.login();
@@ -72,7 +72,6 @@ public class LoginActivity extends AppCompatActivity implements ILogin {
 
     @Override
     public void onsuccess(String token) {
-        Toast.makeText(this, token, Toast.LENGTH_LONG).show();
         Intent i = new Intent(this, ChartActivity.class);
         i.putExtra("token", token);
         startActivity(i);
