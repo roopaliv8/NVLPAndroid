@@ -3,32 +3,45 @@ package com.nvlp.ui.activity;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import com.nvlp.R;
-import com.nvlp.databinding.ActivityChartBinding;
-import com.nvlp.model.response.ChartDatum;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.here.oksse.OkSse;
+import com.here.oksse.ServerSentEvent;
+import com.nvlp.R;
+import com.nvlp.databinding.ActivityChartBinding;
+import com.nvlp.model.response.ChartDatum;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static com.nvlp.utils.Constants.DEMOURL;
 
 public class ChartActivity extends AppCompatActivity {
     ActivityChartBinding binding;
     String demodata = "[{\"name\":\"BTC\",\"key\":\"btc\",\"value\":70},{\"name\":\"ETH\",\"key\":\"eth\",\"value\":80},{\"name\":\"LTE\",\"key\":\"lte\",\"value\":79},{\"name\":\"RPL\",\"key\":\"rpl\",\"value\":23},{\"name\":\"PLN\",\"key\":\"pln\",\"value\":38},{\"name\":\"USD\",\"key\":\"usd\",\"value\":85},{\"name\":\"EUR\",\"key\":\"eur\",\"value\":67},{\"name\":\"THB\",\"key\":\"thb\",\"value\":23}]";
 
     List<ChartDatum> datumList;
+    private ServerSentEvent sse;
+
+    private final int min = 1;
+    private final int max = 5;
+    private boolean isPlus = true; //TODO need to remove
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,45 +58,7 @@ public class ChartActivity extends AppCompatActivity {
         //placing toolbar in place of actionbar
         setSupportActionBar(toolbar);
 
-        parseJSON();
-
-        binding.chart.setDescription("");
-        binding.chart.animateXY(2000, 2000);
-        binding.chart.invalidate();
-
-        final int min = 10;
-        final int max = 200;
-
-
-        //Declare the timer
-        Timer t = new Timer();
-//Set the schedule function and rate
-        t.scheduleAtFixedRate(new TimerTask() {
-
-                                  @Override
-                                  public void run() {
-                                      List<ChartDatum> datalist = new ArrayList<>();
-                                      for (ChartDatum chartDatum : datumList) {
-                                          int random = new Random().nextInt((max - min) + 1) + min;
-                                          chartDatum.setValue(random);
-                                          datalist.add(chartDatum);
-                                      }
-                                      runOnUiThread(new Runnable() {
-                                          @Override
-                                          public void run() {
-                                              addchatData(datalist);
-                                              binding.chart.notifyDataSetChanged();
-                                              binding.chart.invalidate();
-                                          }//public void run() {
-                                      });
-
-                                  }
-
-                              },
-//Set how long before to start calling the TimerTask (in milliseconds)
-                0,
-//Set the amount of time between each execution (in milliseconds)
-                10000);
+        callSSE(getIntent().getStringExtra("token"));
 
 
     }
@@ -119,4 +94,85 @@ public class ChartActivity extends AppCompatActivity {
 
     }
 
+    private void callSSE(final String token) {
+        final Request request = new Request.Builder().addHeader("Content-Type", "application/json")
+                .addHeader("X-JWT", token).url(DEMOURL).build();
+
+        final OkHttpClient client = new OkHttpClient.Builder().readTimeout(0, TimeUnit.SECONDS).build();
+        OkSse oksse = new OkSse(client);
+        sse = oksse.newServerSentEvent(request, new ServerSentEvent.Listener() {
+            @Override
+            public void onOpen(ServerSentEvent sse, Response response) {
+                // When the channel is opened
+
+            }
+
+            @Override
+            public void onMessage(ServerSentEvent sse, String id, String event, String message) {
+                // When a message is received
+                if (datumList == null) {
+                    parseJSON();
+                    runOnUiThread(() -> {
+                        binding.chart.setDescription("");
+                        binding.chart.animateXY(2000, 2000);
+                        binding.chart.invalidate();
+                    });
+
+                } else {
+                    List<ChartDatum> datalist = new ArrayList<>();
+                    for (ChartDatum chartDatum : datumList) {
+                        int random = new Random().nextInt((max - min) + 1) + min;
+                        if (isPlus)
+                            chartDatum.setValue(chartDatum.getValue() - random);
+                        else
+                            chartDatum.setValue(chartDatum.getValue() + random);
+                        datalist.add(chartDatum);
+                    }
+                    isPlus = !isPlus;
+                    runOnUiThread(() -> {
+                        addchatData(datalist);
+                        binding.chart.notifyDataSetChanged();
+                        binding.chart.invalidate();
+                    });
+                }
+
+
+            }
+
+            @WorkerThread
+            @Override
+            public void onComment(ServerSentEvent sse, String comment) {
+                // When a comment is received
+            }
+
+            @WorkerThread
+            @Override
+            public boolean onRetryTime(ServerSentEvent sse, long milliseconds) {
+                return true; // True to use the new retry time received by SSE
+            }
+
+            @WorkerThread
+            @Override
+            public boolean onRetryError(ServerSentEvent sse, Throwable throwable, Response response) {
+                return true; // True to retry, false otherwise
+            }
+
+            @WorkerThread
+            @Override
+            public void onClosed(ServerSentEvent sse) {
+                // Channel closed
+            }
+
+            @Override
+            public Request onPreRetry(ServerSentEvent sse, Request originalRequest) {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sse.close();
+    }
 }

@@ -46,7 +46,7 @@ public class InterceptorHelper {
     }
 
     /**
-     * Common method for unauthorized chatDBUser
+     * Common method for unauthorized
      *
      * @return
      */
